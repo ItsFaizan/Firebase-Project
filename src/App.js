@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Auth } from "./components/auth.js";
 import {db} from "./config/firebase";
-import {getDocs, collection , addDoc} from "firebase/firestore"
+import {getDocs, collection , addDoc, deleteDoc, doc} from "firebase/firestore"
 
 function App() {
   const[foodlist, setFoodlist] = useState([]);
@@ -33,6 +33,12 @@ function App() {
     })
     getFoodlist();
   }
+
+  const deleteFood = async (id) =>{
+    const foodDoc = doc(db, "Food", id);
+    await deleteDoc(foodDoc);
+  }
+
   return (
     <div>
       <Auth/>
@@ -48,6 +54,7 @@ function App() {
           <div>
             <h1 style={{color: food.deliveryAvailable ? "green" : "red" }}>{food.name}</h1>
             <h1>{food.quantity}</h1>
+            <button onClick={() => deleteFood(food.id)}> Delete </button>
             </div>
         ))}
       </div>
