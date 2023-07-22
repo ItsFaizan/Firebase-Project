@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { Auth } from "./components/auth.js";
 import {db} from "./config/firebase";
-import {getDocs, collection , addDoc, deleteDoc, doc} from "firebase/firestore"
+import {getDocs, collection , addDoc, deleteDoc, doc, updateDoc} from "firebase/firestore"
 
 function App() {
   const[foodlist, setFoodlist] = useState([]);
   const [foodname, setFoodname] = useState("");
   const [foodquantity, setFoodquantity] = useState(0);
-  const [delivery, setDelivery] = useState(true);
+  const [delivery, setDelivery] = useState(false);
+  const [updatename, setUpdatename] = useState("");
 
   const foodCollectionRef = collection(db, "Food");
 
@@ -37,6 +38,13 @@ function App() {
   const deleteFood = async (id) =>{
     const foodDoc = doc(db, "Food", id);
     await deleteDoc(foodDoc);
+    getFoodlist();
+  }
+
+  const UpdateFood = async (id) =>{
+    const foodDoc = doc(db, "Food", id);
+    await updateDoc(foodDoc, {name: updatename});
+    getFoodlist();
   }
 
   return (
@@ -55,6 +63,8 @@ function App() {
             <h1 style={{color: food.deliveryAvailable ? "green" : "red" }}>{food.name}</h1>
             <h1>{food.quantity}</h1>
             <button onClick={() => deleteFood(food.id)}> Delete </button>
+            <input placeholder="Update Food Name!" onChange={(e) => setUpdatename(e.target.value)}/>
+            <button onClick={() => UpdateFood(food.id)}>Update</button>
             </div>
         ))}
       </div>
