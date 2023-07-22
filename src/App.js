@@ -7,30 +7,32 @@ function App() {
   const[foodlist, setFoodlist] = useState([]);
   const [foodname, setFoodname] = useState("");
   const [foodquantity, setFoodquantity] = useState(0);
-  const [delivery, setDelivery] = useState(false);
+  const [delivery, setDelivery] = useState(true);
 
   const foodCollectionRef = collection(db, "Food");
 
+  const getFoodlist = async () => {
+    const data = await getDocs(foodCollectionRef)
+    const filterData = data.docs.map((doc) =>({
+        ...doc.data(),
+        id: doc.id,
+    }));
+    setFoodlist(filterData);
+  };
+  
+
   useEffect(() =>{
-    const getFoodlist = async () => {
-      const data = await getDocs(foodCollectionRef)
-      const filterData = data.docs.map((doc) =>({
-          ...doc.data(),
-          id: doc.id,
-      }));
-      setFoodlist(filterData);
-    };
-     getFoodlist();
-     
+    getFoodlist();
   }, [])
 
-  const onSubmitFood = async () => [
+  const onSubmitFood = async () => {
     await addDoc(foodCollectionRef, {
       name: foodname,
       quantity: foodquantity,
-      delivery: delivery,
+      deliveryAvailable: delivery,
     })
-  ]
+    getFoodlist();
+  }
   return (
     <div>
       <Auth/>
@@ -44,7 +46,7 @@ function App() {
       <div>
         {foodlist.map((food) => (
           <div>
-            <h1 style={{color: food.deliveryAvailable? "green ": "red" }}>{food.name}</h1>
+            <h1 style={{color: food.deliveryAvailable ? "green" : "red" }}>{food.name}</h1>
             <h1>{food.quantity}</h1>
             </div>
         ))}
